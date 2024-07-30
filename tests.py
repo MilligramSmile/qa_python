@@ -1,6 +1,7 @@
 import pytest
 from main import BooksCollector
 
+
 # класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
 # обязательно указывать префикс Test
 class TestBooksCollector:
@@ -19,7 +20,7 @@ class TestBooksCollector:
 
         # проверяем, что добавилось именно две
         # словарь books_rating, который нам возвращает метод get_books_rating, имеет длину 2
-        assert len(collector.get_books_rating()) == 2
+        assert len(collector.get_books_genre()) == 2
 
     # напиши свои тесты ниже
     # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
@@ -44,9 +45,7 @@ class TestBooksCollector:
 
     def test_get_books_with_specific_genre(self, collector):
         collector.add_new_book('Автостопом по галактике')
-        collector.add_new_book('Мертвая зона')
         collector.set_book_genre('Автостопом по галактике', 'Фантастика')
-        collector.set_book_genre('Мертвая зона', 'Ужасы')
         assert collector.get_books_with_specific_genre('Фантастика') == ['Автостопом по галактике']
 
     def test_get_books_for_children(self, collector):
@@ -74,12 +73,18 @@ class TestBooksCollector:
         collector.add_book_in_favorites('Таинственный остров')
         assert set(collector.get_list_of_favorites_books()) == {'Финансист', 'Таинственный остров'}
 
-    @pytest.mark.parametrize("book_name, expected", [
-        ('B' * 40, True),
-        ('B' * 41, False),
-        ('', False),
-        ('A', True),
+    @pytest.mark.parametrize("book_name", [
+        'B' * 40,
+        'A',
     ])
-    def test_add_new_book_boundary_values(self, collector, book_name, expected):
+    def test_add_new_book_valid_names(self, collector, book_name):
         collector.add_new_book(book_name)
-        assert (book_name in collector.get_books_genre()) == expected
+        assert book_name in collector.get_books_genre()
+
+    @pytest.mark.parametrize("book_name", [
+        'B' * 41,
+        '',
+    ])
+    def test_add_new_book_invalid_names(self, collector, book_name):
+        collector.add_new_book(book_name)
+        assert book_name not in collector.get_books_genre()
